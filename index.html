@@ -62,8 +62,19 @@
         
         /* 1. Giao diện POPUP NHẬP THÔNG TIN */
         #info-popup h2 { color: #333; font-size: 1.35rem; margin-bottom: 5px; }
-        #info-popup input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; }
-        #info-popup input:focus { border-color: #e60000; box-shadow: 0 0 5px rgba(230,0,0,0.2); }
+        
+        /* CẬP NHẬT CSS: Áp dụng cho cả input và thẻ select dropdown */
+        #info-popup input, #info-popup select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            outline: none; 
+            transition: 0.2s; 
+            background-color: #fff;
+        }
+        #info-popup input:focus, #info-popup select:focus { border-color: #e60000; box-shadow: 0 0 5px rgba(230,0,0,0.2); }
         #submit-info { padding: 13px; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 8px; font-size: 1rem; background: #e60000; transition: 0.2s; }
         #submit-info:hover { background: #b30000; }
 
@@ -98,6 +109,15 @@
         <h2>Nhập thông tin Khách hàng</h2>
         <input type="text" id="name" placeholder="Họ và tên của bạn">
         <input type="text" id="phone" placeholder="Số điện thoại của bạn">
+        
+        <select id="head-branch">
+            <option value="" disabled selected>-- Chọn cửa hàng --</option>
+            <option value="HEAD VTP 1">VTP 5</option>
+            <option value="HEAD VTP 2">VTP 6</option>
+            <option value="HEAD VTP 3">VTP 7</option>
+            <option value="HEAD VTP 4">VTP 8</option>
+        </select>
+        
         <button id="submit-info">Xác nhận thông tin</button>
     </div>
 
@@ -137,6 +157,7 @@
 
         let savedName = "";
         let savedPhone = "";
+        let savedHead = ""; // THAY ĐỔI: Khởi tạo biến lưu thông tin HEAD
 
         // Hàm kiểm tra số lượng tồn kho thực tế từ ô F2 trên Google Sheet
         async function checkLiveStock() {
@@ -155,9 +176,11 @@
         submitInfoBtn.addEventListener('click', () => {
             savedName = document.getElementById('name').value.trim();
             savedPhone = document.getElementById('phone').value.trim();
+            savedHead = document.getElementById('head-branch').value; // THAY ĐỔI: Lấy giá trị của dropdown HEAD
             
-            if (!savedName || !savedPhone) {
-                alert("Vui lòng nhập đầy đủ họ tên và số điện thoại để tham gia!");
+            // THAY ĐỔI: Kiểm tra nếu chưa chọn HEAD thì báo lỗi
+            if (!savedName || !savedPhone || !savedHead) {
+                alert("Vui lòng nhập đầy đủ họ tên, số điện thoại và chọn cơ sở HEAD để tham gia!");
                 return;
             }
 
@@ -226,6 +249,7 @@
                         body: JSON.stringify({
                             name: savedName,
                             phone: savedPhone,
+                            head: savedHead, // THAY ĐỔI: Gửi thêm thông tin HEAD lên Google Sheet
                             reward: reward
                         })
                     });
@@ -241,9 +265,10 @@
         closeRewardBtn.addEventListener('click', () => {
             rewardPopup.classList.remove('active');
             
-            // Xóa sạch dữ liệu cũ trong input
+            // Xóa sạch dữ liệu cũ trong input và reset dropdown về mặc định
             document.getElementById('name').value = "";
             document.getElementById('phone').value = "";
+            document.getElementById('head-branch').selectedIndex = 0; // THAY ĐỔI: Reset menu thả xuống
             
             // Quay lại popup thông tin ban đầu
             infoPopup.classList.add('active');
